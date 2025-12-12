@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Donation Dashboard</title>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
+
+    .header {
+        background: #5ed533;
+        color: white;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .dashboard {
+        max-width: 1000px;
+        margin: 30px auto;
+        padding: 20px;
+    }
+
+    .stats {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+    }
+
+    .card {
+        background: white;
+        padding: 20px;
+        width: 45%;
+        text-align: center;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px #ccc;
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    /* Add Donation Form */
+    .form-box {
+        background: white;
+        padding: 35px;
+        border-radius: 10px;
+        width: 320px;
+        margin: 10px auto;
+        box-shadow: 0 2px 6px #ccc;
+    }
+
+    input {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        background: #5ed533;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #4bb02b;
+    }
+
+    /* Table */
+    table {
+        width: 100%;
+        background: white;
+        border-collapse: collapse;
+        margin-top: 25px;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 6px #ccc;
+    }
+
+    th, td {
+        padding: 12px;
+        text-align: center;
+        border-bottom: 1px solid #eee;
+    }
+
+    th {
+        background: #7bea26;
+        color: white;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>Donation Tracking Dashboard</h1>
+</div>
+
+<div class="dashboard">
+    <!-- Stats Cards -->
+    <div class="stats">
+        <div class="card" id="totalDonations">Total Donations: ₹0</div>
+        <div class="card" id="totalDonors">Total Donors: 0</div>
+    </div>
+    <!-- Add Donor Form -->
+    <div class="form-box">
+        <h3 style="text-align:center;">Add Donation</h3>
+        <input type="text" id="donorName" placeholder="Donor Name">
+        <input type="number" id="donorAmount" placeholder="Donation Amount (₹)">
+        <button onclick="addDonation()">Add Donation</button>
+    </div>
+    <!-- Chart -->
+    <h2 style="text-align:center;">Donation Trends</h2>
+    <canvas id="donationChart" height="120"></canvas>
+
+    <!-- Donation Table -->
+    <h2 style="text-align:center; margin-top:30px;">Donation Records</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Donor</th>
+                <th>Amount (₹)</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody id="donationTable"></tbody>
+    </table>
+
+</div>
+
+<script>
+    // Dummy donation data
+    let donations = [
+        { name: "Naveen", amount: 500, date: "2025-01-01" },
+        { name: "Riya", amount: 1200, date: "2025-01-03" },
+        { name: "Karan", amount: 800, date: "2025-01-05" },
+        { name: "Aditi", amount: 600, date: "2025-01-08" },
+        { name: "Samuel", amount: 1500, date: "2025-01-10" }
+    ];
+
+    function updateStats() {
+        const totalAmount = donations.reduce((sum, d) => sum + d.amount, 0);
+        document.getElementById("totalDonations").innerText = "Total Donations: ₹" + totalAmount;
+        document.getElementById("totalDonors").innerText = "Total Donors: " + donations.length;
+    }
+
+    function updateTable() {
+        const tableBody = document.getElementById("donationTable");
+        tableBody.innerHTML = "";
+        donations.forEach(d => {
+            tableBody.innerHTML += `
+                <tr>
+                    <td>${d.name}</td>
+                    <td>₹${d.amount}</td>
+                    <td>${d.date}</td>
+                </tr>
+            `;
+        });
+    }
+
+    // Chart Setup
+    const ctx = document.getElementById('donationChart');
+    const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: donations.map(d => d.date),
+            datasets: [{
+                label: 'Donation Amount (₹)',
+                data: donations.map(d => d.amount),
+                borderColor: "#5ed533",
+                backgroundColor: "rgba(94, 213, 51, 0.3)",
+                fill: true,
+                tension: 0.3,
+                borderWidth: 2
+            }]
+        }
+    });
+
+    function updateChart() {
+        chart.data.labels = donations.map(d => d.date);
+        chart.data.datasets[0].data = donations.map(d => d.amount);
+        chart.update();
+    }
+
+    // Add Donation
+    function addDonation() {
+        const name = document.getElementById("donorName").value;
+        const amount = Number(document.getElementById("donorAmount").value);
+
+        if (name === "" || amount <= 0) {
+            alert("Enter valid donor details.");
+            return;
+        }
+
+        const today = new Date().toISOString().slice(0, 10);
+
+        donations.push({ name, amount, date: today });
+
+        updateStats();
+        updateTable();
+        updateChart();
+
+        document.getElementById("donorName").value = "";
+        document.getElementById("donorAmount").value = "";
+    }
+
+    updateStats();
+    updateTable();
+</script>
+
+</body>
+</html>
