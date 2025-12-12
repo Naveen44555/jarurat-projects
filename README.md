@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 🌟 Internship Assignment Projects
 
 This repository contains two fully functional front-end projects developed as part of the internship assignment:
@@ -132,3 +133,6 @@ Dashboard loads with dummy data
 Use Add Donation form to enter new records
 
 Chart + stats + table update instantly
+=======
+
+>>>>>>> 96d3fdfd9ad5cd7dde8fdb0884873844d306924d
